@@ -1,7 +1,8 @@
 import os
 
-from langchain import HuggingFaceHub, LLMChain
-from langchain import PromptTemplate
+from langchain.chat_models import ChatOpenAI
+from langchain.chains import LLMChain
+from langchain.prompts import PromptTemplate
 
 os.environ["ACTIVELOOP_TOKEN"] = ("eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0"
                                   ".eyJpZCI6Im1yaW8iLCJhcGlfa2V5IjoiMi1INHBkZnY2M0syS0Rtc2JhVjNLSnZ2NUlwWTBjenJiaTFhZkxOZzlMYkZLIn0.")
@@ -12,32 +13,10 @@ os.environ["HUGGINGFACEHUB_API_TOKEN"] = "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"
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    # initialize Hub LLM
-    hub_llm = HuggingFaceHub(
-        repo_id='google/flan-t5-large',
-        model_kwargs={'temperature': 0}
-    )
-
-    multi_template = """Answer the following questions one at a time.
-
-    Questions:
-    {questions}
-
-    Answers:
-    
-    """
-    long_prompt = PromptTemplate(template=multi_template, input_variables=["questions"])
-
-    llm_chain = LLMChain(
-        prompt=long_prompt,
-        llm=hub_llm
-    )
-
-    qs_str = (
-            "1. What is the capital city of France?\n" +
-            "2. What is the largest mammal on Earth?\n" +
-            "3. Which gas is most abundant in Earth's atmosphere?\n" +
-            "4.What color is a ripe banana?\n"
-    )
-    res = llm_chain.run(qs_str)
-    print(res)
+    llm = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0)
+    summarization_template = "Summarize the following text in less than ten words: {text}"
+    summarization_prompt = PromptTemplate(input_variables=["text"], template=summarization_template)
+    summarization_chain = LLMChain(llm=llm, prompt=summarization_prompt)
+    text = "LangChain provides many modules that can be used to build language model applications. Modules can be combined to create more complex applications, or be used individually for simple applications. The most basic building block of LangChain is calling an LLM on some input. Let’s walk through a simple example of how to do this. For this purpose, let’s pretend we are building a service that generates a company name based on what the company makes."
+    summarized_text = summarization_chain.predict(text=text)
+    print(summarized_text)
