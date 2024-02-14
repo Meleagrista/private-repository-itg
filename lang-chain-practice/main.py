@@ -12,28 +12,32 @@ os.environ["HUGGINGFACEHUB_API_TOKEN"] = "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"
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    template = """Question: {question}
-
-    Answer: """
-    prompt = PromptTemplate(
-        template=template,
-        input_variables=['question']
-    )
-
-    # user question
-    question = "What is the capital city of France?"
-
     # initialize Hub LLM
     hub_llm = HuggingFaceHub(
         repo_id='google/flan-t5-large',
         model_kwargs={'temperature': 0}
     )
 
-    # create prompt template > LLM chain
+    multi_template = """Answer the following questions one at a time.
+
+    Questions:
+    {questions}
+
+    Answers:
+    
+    """
+    long_prompt = PromptTemplate(template=multi_template, input_variables=["questions"])
+
     llm_chain = LLMChain(
-        prompt=prompt,
+        prompt=long_prompt,
         llm=hub_llm
     )
 
-    # ask the user question about the capital of France
-    print(llm_chain.run(question))
+    qs_str = (
+            "1. What is the capital city of France?\n" +
+            "2. What is the largest mammal on Earth?\n" +
+            "3. Which gas is most abundant in Earth's atmosphere?\n" +
+            "4.What color is a ripe banana?\n"
+    )
+    res = llm_chain.run(qs_str)
+    print(res)
