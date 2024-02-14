@@ -1,18 +1,39 @@
 import os
 
-from langchain_openai import OpenAI
-from langchain.callbacks import get_openai_callback
+from langchain import HuggingFaceHub, LLMChain
+from langchain import PromptTemplate
 
 os.environ["ACTIVELOOP_TOKEN"] = ("eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0"
                                   ".eyJpZCI6Im1yaW8iLCJhcGlfa2V5IjoiMi1INHBkZnY2M0syS0Rtc2JhVjNLSnZ2NUlwWTBjenJiaTFhZkxOZzlMYkZLIn0.")
 os.environ["OPENAI_API_KEY"] = "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"
 os.environ["GOOGLE_API_KEY"] = "AIzaSyDrAvNPH3FTcael_LnHagXYybNu1--IVLc"
 os.environ["GOOGLE_CSE_ID"] = "974b03204274e4f99"
+os.environ["HUGGINGFACEHUB_API_TOKEN"] = "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"
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    llm = OpenAI(model_name="gpt-3.5-turbo-instruct", n=2, best_of=2)
+    template = """Question: {question}
 
-    with get_openai_callback() as cb:
-        result = llm.invoke("Tell me a joke")  # Using invoke instead of __call__
-        print(cb)
+    Answer: """
+    prompt = PromptTemplate(
+        template=template,
+        input_variables=['question']
+    )
+
+    # user question
+    question = "What is the capital city of France?"
+
+    # initialize Hub LLM
+    hub_llm = HuggingFaceHub(
+        repo_id='google/flan-t5-large',
+        model_kwargs={'temperature': 0}
+    )
+
+    # create prompt template > LLM chain
+    llm_chain = LLMChain(
+        prompt=prompt,
+        llm=hub_llm
+    )
+
+    # ask the user question about the capital of France
+    print(llm_chain.run(question))
