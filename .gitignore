@@ -1,0 +1,4 @@
+
+lang-chain-practice/models/ggml-model-q4_0.bin
+lang-chain-practice/.env
+lang-chain-practice/models/gpt4all-lora-quantized-ggml.bin
