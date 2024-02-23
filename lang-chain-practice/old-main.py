@@ -3,6 +3,7 @@ import os
 from langchain.chat_models import ChatOpenAI
 from langchain.schema import (
     HumanMessage,
+    AIMessage,
     SystemMessage
 )
 
@@ -40,6 +41,7 @@ from langchain.prompts import PromptTemplate"""
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     # llm = OpenAI(model_name="gpt-3.5-turbo", temperature=0)
+    llm = ChatOpenAI(model_name="gpt-3.5-turbo")
     chat = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0)
     # chat = ChatOpenAI(model_name="gpt-4", temperature=0)
 
@@ -92,7 +94,7 @@ if __name__ == '__main__':
     chain = LLMChain(llm=llm, prompt=prompt)
     print(chain.run("wireless headphones"))"""
 
-    batch_messages = [
+    """batch_messages = [
         [
             SystemMessage(content="You are a helpful assistant that translates English to French."),
             HumanMessage(content="Translate the following sentence: I love programming.")
@@ -102,5 +104,18 @@ if __name__ == '__main__':
             HumanMessage(content="Translate the following sentence: J'aime la programmation.")
         ],
     ]
-    print(chat.generate(batch_messages))
+    print(chat.generate(batch_messages))"""
+
+    messages = [
+        SystemMessage(content="You are a helpful assistant."),
+        HumanMessage(content="What is the capital of France?"),
+        AIMessage(content="The capital of France is Paris.")
+    ]
+    prompt = HumanMessage(
+        content="I'd like to know more about the city you just mentioned."
+    )
+    # add to messages
+    messages.append(prompt)
+    response = llm(messages)
+    print(response)
 
